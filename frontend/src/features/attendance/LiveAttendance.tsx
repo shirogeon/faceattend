@@ -30,11 +30,19 @@ export const LiveAttendance: React.FC = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [scanStatus, setScanStatus] = useState('Memuat sistem optik & AI...');
   const [isReady, setIsReady] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const successAudioRef = useRef<HTMLAudioElement | null>(null);
+  const errorAudioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    successAudioRef.current = new Audio('/beep-success.mp3');
+    errorAudioRef.current = new Audio('/beep-error.mp3');
   }, []);
 
   const toggleFullScreen = () => {
@@ -141,6 +149,7 @@ export const LiveAttendance: React.FC = () => {
     try {
       await axios.post('https://faceattend-tjuy.vercel.app/api/v1/attendance', { userId, confidence: 0.1 });
       
+      successAudioRef.current?.play().catch(() => {});
       cleanSwal.fire({
         icon: 'success',
         title: 'Absensi Berhasil',
@@ -160,6 +169,7 @@ export const LiveAttendance: React.FC = () => {
     } finally {
       setTimeout(() => {
         isProcessingRef.current = false;
+        setIsProcessing(false);
         setScanStatus('Sistem Siap. Silakan arahkan wajah ke kamera.');
       }, 4500); 
     }
@@ -191,10 +201,23 @@ export const LiveAttendance: React.FC = () => {
 
           if (bestMatch) {
             isProcessingRef.current = true;
+            setIsProcessing(true);
             setScanStatus(`Memproses data absensi untuk ${bestMatch.firstName}...`);
             recordAttendance(bestMatch.id, bestMatch.firstName, bestMatch.lastName);
+          } else {
+            isProcessingRef.current = true;
+            setIsProcessing(true);
+            setScanStatus('Wajah tidak dikenali. Coba lagi...');
+            errorAudioRef.current?.play().catch(() => {});
+            setTimeout(() => {
+              isProcessingRef.current = false;
+              setIsProcessing(false);
+              setScanStatus('Sistem Siap. Silakan arahkan wajah ke kamera.');
+            }, 3000);
           }
-        } catch (error) {} 
+        } catch (error) {
+          // Ignore detection errors while waiting for a valid face.
+        } 
       }
     }, 1500);
 
@@ -203,6 +226,12 @@ export const LiveAttendance: React.FC = () => {
 
   return (
     <div className="flex h-screen w-full bg-slate-50 text-slate-800 font-sans">
+      <style>{`
+        @keyframes laserMove {
+          from { transform: translateY(-20%); }
+          to { transform: translateY(120%); }
+        }
+      `}</style>
       <div className="w-full max-w-7xl mx-auto flex items-center justify-center p-6 gap-8">
         
         <div className="w-1/3 flex flex-col gap-4">
@@ -244,9 +273,9 @@ export const LiveAttendance: React.FC = () => {
             </div>
             
             <div className="mt-8 pt-6 border-t border-slate-100 flex items-center justify-center gap-2">
-              {employees.length === 0 && !isProcessingRef.current && <RefreshCw className="w-4 h-4 text-amber-500 animate-spin" />}
+              {employees.length === 0 && !isProcessing && <RefreshCw className="w-4 h-4 text-amber-500 animate-spin" />}
               <p className={`text-sm font-semibold text-center ${
-                isProcessingRef.current ? 'text-violet-600' : 
+                isProcessing ? 'text-violet-600' : 
                 (isReady && employees.length > 0 ? 'text-emerald-600' : 'text-amber-500')
               }`}>
                 {scanStatus}
@@ -282,6 +311,23 @@ export const LiveAttendance: React.FC = () => {
               className="w-full h-full object-cover" 
               style={{ transform: 'scaleX(-1)' }} 
             />
+
+            {!isProcessing && (
+              <div className="absolute inset-0 pointer-events-none">
+                <div className="absolute inset-0">
+                  <div className="absolute left-[30%] top-0 h-full w-px bg-violet-400/70" style={{ animation: 'laserMove 3s ease-in-out infinite alternate' }} />
+                  <div className="absolute left-[70%] top-0 h-full w-px bg-violet-400/70" style={{ animation: 'laserMove 3.6s ease-in-out infinite alternate', animationDelay: '0.8s' }} />
+                </div>
+              </div>
+            )}
+
+            {isProcessing && (
+              <div className="absolute inset-0 bg-slate-950/40 flex items-center justify-center pointer-events-none">
+                <div className="text-center px-6 py-4 rounded-3xl bg-slate-900/60 border border-white/20">
+                  <p className="text-white text-lg font-semibold tracking-wide">Menganalisis Biometrik...</p>
+                </div>
+              </div>
+            )}
             
             <div className="absolute inset-0 pointer-events-none p-12">
               <div className="w-full h-full border-2 border-dashed border-white/50 rounded-3xl relative">
