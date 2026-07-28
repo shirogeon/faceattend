@@ -214,7 +214,7 @@ export const LiveAttendance: React.FC = () => {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-slate-900">Kiosk Absensi</h1>
-                <p className="text-sm text-slate-500">FaceAttend Enterprise</p>
+                <p className="text-sm text-slate-500">Live Log Absen</p>
               </div>
             </div>
 

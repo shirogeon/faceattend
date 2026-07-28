@@ -11,7 +11,7 @@ export const LandingPage: React.FC = () => {
           <div className="w-10 h-10 bg-violet-600 rounded-xl flex items-center justify-center shadow-lg shadow-violet-600/20">
             <ScanFace className="w-6 h-6 text-white" />
           </div>
-          <span className="text-xl font-bold tracking-tight text-slate-900">FaceAttend</span>
+          <span className="text-xl font-bold tracking-tight text-slate-900">Live Log Absen</span>
         </div>
         <div>
           <Link 

@@ -232,7 +232,7 @@ export const Dashboard: React.FC = () => {
           <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center">
             <Fingerprint className="w-5 h-5 text-white" />
           </div>
-          <h1 className="text-lg font-bold text-slate-900">FaceAttend</h1>
+          <h1 className="text-lg font-bold text-slate-900">Live Log Absen</h1>
         </div>
         
         <nav className="flex-1 py-6 px-4 space-y-2">
