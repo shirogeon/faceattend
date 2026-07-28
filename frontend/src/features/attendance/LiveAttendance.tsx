@@ -32,18 +32,18 @@ export const LiveAttendance: React.FC = () => {
   const [isReady, setIsReady] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const successAudioRef = useRef<HTMLAudioElement | null>(null);
-  const errorAudioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    successAudioRef.current = new Audio('/beep-success.mp3');
-    errorAudioRef.current = new Audio('/beep-error.mp3');
-  }, []);
+  const speakText = (text: string) => {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'id-ID';
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utterance);
+  };
 
   const toggleFullScreen = () => {
     if (!document.fullscreenElement) {
@@ -149,7 +149,7 @@ export const LiveAttendance: React.FC = () => {
     try {
       await axios.post('https://faceattend-tjuy.vercel.app/api/v1/attendance', { userId, confidence: 0.1 });
       
-      successAudioRef.current?.play().catch(() => {});
+      speakText(`Absensi berhasil, selamat datang ${firstName} ${lastName}`);
       cleanSwal.fire({
         icon: 'success',
         title: 'Absensi Berhasil',
@@ -158,6 +158,7 @@ export const LiveAttendance: React.FC = () => {
         showConfirmButton: false
       });
     } catch (error: any) {
+      speakText('Gagal, wajah tidak dikenali, silakan coba lagi.');
       const errMsg = error.response?.data?.message || error.message || 'Error tidak diketahui';
       cleanSwal.fire({
         icon: 'error',
@@ -208,7 +209,7 @@ export const LiveAttendance: React.FC = () => {
             isProcessingRef.current = true;
             setIsProcessing(true);
             setScanStatus('Wajah tidak dikenali. Coba lagi...');
-            errorAudioRef.current?.play().catch(() => {});
+            speakText('Gagal, wajah tidak dikenali, silakan coba lagi.');
             setTimeout(() => {
               isProcessingRef.current = false;
               setIsProcessing(false);
