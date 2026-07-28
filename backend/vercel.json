@@ -1,15 +1,13 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "src/server.ts",
-      "use": "@vercel/node"
+  "functions": {
+    "src/server.ts": {
+      "memory": 1024
     }
-  ],
-  "routes": [
+  },
+  "rewrites": [
     {
-      "src": "/(.*)",
-      "dest": "src/server.ts"
+      "source": "/(.*)",
+      "destination": "/src/server.ts"
     }
   ]
 }
