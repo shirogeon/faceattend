@@ -26,6 +26,7 @@ export const LiveAttendance: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const isProcessingRef = useRef(false);
+  const [isScanComplete, setIsScanComplete] = useState(false);
   
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [scanStatus, setScanStatus] = useState('Memuat sistem optik & AI...');
@@ -39,10 +40,14 @@ export const LiveAttendance: React.FC = () => {
   }, []);
 
   const speakText = (text: string) => {
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'id-ID';
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(utterance);
+    return new Promise<void>((resolve) => {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'id-ID';
+      window.speechSynthesis.cancel();
+      utterance.onend = () => resolve();
+      utterance.onerror = () => resolve();
+      window.speechSynthesis.speak(utterance);
+    });
   };
 
   const toggleFullScreen = () => {
@@ -148,8 +153,8 @@ export const LiveAttendance: React.FC = () => {
   const recordAttendance = async (userId: string, firstName: string, lastName: string) => {
     try {
       await axios.post('https://faceattend-tjuy.vercel.app/api/v1/attendance', { userId, confidence: 0.1 });
-      
-      speakText(`Absensi berhasil, selamat datang ${firstName} ${lastName}`);
+
+      await speakText(`Absensi berhasil, selamat datang ${firstName} ${lastName}`);
       cleanSwal.fire({
         icon: 'success',
         title: 'Absensi Berhasil',
@@ -157,6 +162,8 @@ export const LiveAttendance: React.FC = () => {
         timer: 3000,
         showConfirmButton: false
       });
+
+      setIsScanComplete(true);
     } catch (error: any) {
       speakText('Gagal, wajah tidak dikenali, silakan coba lagi.');
       const errMsg = error.response?.data?.message || error.message || 'Error tidak diketahui';
@@ -176,11 +183,20 @@ export const LiveAttendance: React.FC = () => {
     }
   };
 
+  const handleNextScan = () => {
+    setIsScanComplete(false);
+    isProcessingRef.current = false;
+    setIsProcessing(false);
+    setScanStatus('Sistem Siap. Silakan arahkan wajah ke kamera.');
+  };
+
   useEffect(() => {
     if (!isReady || employees.length === 0) return;
+    if (isScanComplete) return; // do not start detection when a scan has completed
 
     const interval = setInterval(async () => {
       if (isProcessingRef.current) return;
+      if (isScanComplete) return;
 
       if (videoRef.current) {
         try {
@@ -223,7 +239,7 @@ export const LiveAttendance: React.FC = () => {
     }, 1500);
 
     return () => clearInterval(interval);
-  }, [isReady, employees]);
+  }, [isReady, employees, isScanComplete]);
 
   return (
     <div className="flex h-screen w-full bg-slate-50 text-slate-800 font-sans">
@@ -312,6 +328,20 @@ export const LiveAttendance: React.FC = () => {
               className="w-full h-full object-cover" 
               style={{ transform: 'scaleX(-1)' }} 
             />
+
+            {isScanComplete && (
+              <div className="absolute inset-0 bg-violet-800/40 flex items-center justify-center z-40">
+                <div className="text-center px-6 py-6 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/20">
+                  <h2 className="text-2xl font-bold text-white mb-4">Absensi Selesai</h2>
+                  <button
+                    onClick={handleNextScan}
+                    className="px-5 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg font-semibold"
+                  >
+                    Pindai Karyawan Berikutnya
+                  </button>
+                </div>
+              </div>
+            )}
 
             {!isProcessing && (
               <div className="absolute inset-0 pointer-events-none">
