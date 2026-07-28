@@ -66,7 +66,7 @@ export const LiveAttendance: React.FC = () => {
 
   const syncEmployeesData = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/v1/employees');
+      const res = await axios.get('https://faceattend-tjuy.vercel.app/api/v1/employees');
       if (res.data.success) {
         const rawData = res.data.data;
         
@@ -139,7 +139,7 @@ export const LiveAttendance: React.FC = () => {
 
   const recordAttendance = async (userId: string, firstName: string, lastName: string) => {
     try {
-      await axios.post('http://localhost:5000/api/v1/attendance', { userId, confidence: 0.1 });
+      await axios.post('https://faceattend-tjuy.vercel.app/api/v1/attendance', { userId, confidence: 0.1 });
       
       cleanSwal.fire({
         icon: 'success',

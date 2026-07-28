@@ -61,7 +61,7 @@ export const Dashboard: React.FC = () => {
 
   const fetchEmployees = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/v1/employees');
+      const response = await axios.get('https://faceattend-tjuy.vercel.app/api/v1/employees');
       if (response.data && response.data.success) {
         setEmployees(response.data.data || []);
       }
@@ -70,7 +70,7 @@ export const Dashboard: React.FC = () => {
 
   const fetchLogsAndStats = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/v1/attendance/logs');
+      const response = await axios.get('https://faceattend-tjuy.vercel.app/api/v1/attendance/logs');
       if (response.data && response.data.success) {
         setAttendanceLogs(response.data.data.logs || []);
         setTodayAttendance(response.data.data.stats?.todayAttendance || 0);
@@ -135,7 +135,7 @@ export const Dashboard: React.FC = () => {
     
     setIsSubmitting(true);
     try {
-      const res = await axios.post('http://localhost:5000/api/v1/employees', { 
+      const res = await axios.post('https://faceattend-tjuy.vercel.app/api/v1/employees', { 
         name, employeeId, email, faceDescriptor, snapshotUrl 
       });
       if (res.data.success) {
@@ -160,7 +160,7 @@ export const Dashboard: React.FC = () => {
 
     if (result.isConfirmed) {
       try {
-        const res = await axios.delete(`http://localhost:5000/api/v1/employees/${id}`);
+        const res = await axios.delete(`https://faceattend-tjuy.vercel.app/api/v1/employees/${id}`);
         if (res.data.success) {
           setSelectedDossier(null);
           fetchEmployees();
