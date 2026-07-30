@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { Users, LayoutDashboard, LogOut, UserPlus, X, FileSpreadsheet, ClipboardList, Terminal, Activity, Fingerprint, Search, CheckCircle2, Trash2, Camera, Binary, Database } from 'lucide-react';
+import { Users, LayoutDashboard, LogOut, UserPlus, X, FileSpreadsheet, ClipboardList, Terminal, Activity, Fingerprint, Search, CheckCircle2, Trash2, Camera, Binary, Database, Menu } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
@@ -53,6 +53,7 @@ export const Dashboard: React.FC = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDossier, setSelectedDossier] = useState<Employee | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -227,9 +228,10 @@ export const Dashboard: React.FC = () => {
   }, [attendanceLogs]);
 
   return (
-    <div className="flex h-screen w-full bg-slate-50 text-slate-800 font-sans">
+    <div className="min-h-screen w-full bg-slate-50 text-slate-800 font-sans lg:flex">
+      <div className={`fixed inset-0 z-30 bg-slate-900/40 lg:hidden ${isSidebarOpen ? 'block' : 'hidden'}`} onClick={() => setIsSidebarOpen(false)} />
       
-      <aside className="w-64 bg-white border-r border-slate-200 flex flex-col z-20">
+      <aside className={`fixed inset-y-0 left-0 z-40 w-72 bg-white border-r border-slate-200 flex flex-col transition-transform duration-200 lg:static lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="p-6 border-b border-slate-100 flex items-center gap-3">
           <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center">
             <Fingerprint className="w-5 h-5 text-white" />
@@ -259,15 +261,23 @@ export const Dashboard: React.FC = () => {
         </div>
       </aside>
 
-      <main className="flex-1 flex flex-col overflow-hidden">
-        <header className="h-20 border-b border-slate-200 flex items-center justify-between px-10 bg-white z-10">
-          <h2 className="text-xl font-bold text-slate-800">
-            {activeTab === 'overview' && 'Dashboard Overview'}
-            {activeTab === 'employees' && 'Manajemen Karyawan'}
-            {activeTab === 'attendance' && 'Riwayat Absensi Karyawan'}
-          </h2>
+      <main className="flex-1 flex flex-col min-h-screen">
+        <header className="h-20 border-b border-slate-200 flex items-center justify-between px-4 sm:px-6 lg:px-10 bg-white z-10">
           <div className="flex items-center gap-3">
-            <div className="text-right">
+            <button
+              onClick={() => setIsSidebarOpen(true)}
+              className="rounded-xl border border-slate-200 p-2 text-slate-600 hover:bg-slate-50 lg:hidden"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+            <h2 className="text-lg sm:text-xl font-bold text-slate-800">
+              {activeTab === 'overview' && 'Dashboard Overview'}
+              {activeTab === 'employees' && 'Manajemen Karyawan'}
+              {activeTab === 'attendance' && 'Riwayat Absensi Karyawan'}
+            </h2>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="text-right hidden sm:block">
               <p className="font-semibold text-sm text-slate-900">Administrator</p>
               <p className="text-xs text-slate-500">Super Admin</p>
             </div>
@@ -277,12 +287,12 @@ export const Dashboard: React.FC = () => {
           </div>
         </header>
 
-        <div className="flex-1 overflow-auto p-10 z-10">
+        <div className="flex-1 overflow-auto p-4 sm:p-6 lg:p-10 z-10">
           
           {activeTab === 'overview' && (
             <div className="max-w-6xl mx-auto space-y-6">
               
-              <div className="grid grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-5">
                   <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
                     <Users className="w-7 h-7" />
@@ -321,8 +331,8 @@ export const Dashboard: React.FC = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-6">
-                <div className="col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+              <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                <div className="xl:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 sm:p-8">
                   <h3 className="text-lg font-bold text-slate-800 mb-6">Grafik Log Mingguan (Real-time)</h3>
                   <div className="flex items-end gap-4 h-56 border-b border-slate-100 pb-2 mt-4">
                     {weeklyStats.map((stat, i) => (
@@ -338,7 +348,7 @@ export const Dashboard: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="col-span-1 bg-white rounded-2xl shadow-sm border border-slate-100 p-8 flex flex-col">
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 sm:p-8 flex flex-col">
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="text-lg font-bold text-slate-800">Aktivitas Terbaru</h3>
                     <Terminal className="w-5 h-5 text-slate-400" />
@@ -363,9 +373,9 @@ export const Dashboard: React.FC = () => {
           )}
 
           {activeTab === 'employees' && (
-            <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
-              <div className="flex justify-between items-center mb-8">
-                <div className="relative w-96">
+            <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-100 p-4 sm:p-8">
+              <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-8">
+                <div className="relative w-full sm:w-96">
                   <Search className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
                   <input 
                     type="text" 
@@ -375,7 +385,7 @@ export const Dashboard: React.FC = () => {
                     className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-600/20 focus:border-violet-600 transition-all"
                   />
                 </div>
-                <button onClick={() => setIsModalOpen(true)} className="px-6 py-3 bg-violet-600 hover:bg-violet-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm flex items-center gap-2">
+                <button onClick={() => setIsModalOpen(true)} className="w-full sm:w-auto px-6 py-3 bg-violet-600 hover:bg-violet-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm flex items-center justify-center gap-2">
                   <UserPlus className="w-5 h-5" /> Tambah Karyawan
                 </button>
               </div>
@@ -426,13 +436,13 @@ export const Dashboard: React.FC = () => {
           )}
 
           {activeTab === 'attendance' && (
-            <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
-              <div className="flex justify-between items-center mb-8">
+            <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-100 p-4 sm:p-8">
+              <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-start mb-8">
                 <div>
                   <h3 className="text-xl font-bold text-slate-800">Riwayat Absensi</h3>
                   <p className="text-sm text-slate-500 mt-1">Data log absensi karyawan berbasis pencocokan Euclidean Distance.</p>
                 </div>
-                <button onClick={handleExportCSV} className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2">
+                <button onClick={handleExportCSV} className="w-full sm:w-auto px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2">
                   <FileSpreadsheet className="w-5 h-5" /> Export Laporan (CSV)
                 </button>
               </div>
@@ -493,8 +503,8 @@ export const Dashboard: React.FC = () => {
               <button onClick={() => setSelectedDossier(null)} className="text-slate-400 hover:text-slate-600 bg-white p-2 rounded-full shadow-sm"><X className="w-5 h-5" /></button>
             </div>
 
-            <div className="p-8 flex gap-8">
-              <div className="w-48 h-48 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
+            <div className="p-4 sm:p-8 flex flex-col md:flex-row gap-6 md:gap-8">
+              <div className="w-full max-w-[12rem] h-48 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0 self-center md:self-start">
                 <img 
                   src={selectedDossier.snapshotUrl || `https://ui-avatars.com/api/?name=${selectedDossier.firstName}+${selectedDossier.lastName}&background=f1f5f9&color=7c3aed&size=256`}
                   alt="Foto Profil"
@@ -509,7 +519,7 @@ export const Dashboard: React.FC = () => {
                     <p className="text-2xl font-bold text-slate-900">{selectedDossier.employeeId}</p>
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <p className="text-xs font-bold text-slate-400 uppercase mb-1">Nama Lengkap</p>
                       <p className="text-base font-semibold text-slate-800">{selectedDossier.firstName} {selectedDossier.lastName}</p>
@@ -544,7 +554,7 @@ export const Dashboard: React.FC = () => {
                 <label className="block text-sm font-semibold text-slate-700 mb-2">Nama Lengkap</label>
                 <input type="text" required value={name} onChange={(e) => setName(e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-600/20 focus:border-violet-600" placeholder="Contoh: Budi Santoso" />
               </div>
-              <div className="grid grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-2">ID Karyawan</label>
                   <input type="text" required value={employeeId} onChange={(e) => setEmployeeId(e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-600/20 focus:border-violet-600" placeholder="EMP-001" />

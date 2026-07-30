@@ -259,15 +259,15 @@ export const LiveAttendance: React.FC = () => {
   }, [isReady, employees, isScanComplete]);
 
   return (
-    <div className="flex h-screen w-full bg-slate-50 text-slate-800 font-sans">
+    <div className="min-h-screen w-full bg-slate-50 text-slate-800 font-sans p-4 sm:p-6 lg:p-8">
       <style>{`
         @keyframes laserMove {
           from { transform: translateY(-20%); }
           to { transform: translateY(120%); }
         }
       `}</style>
-      <div className="w-full max-w-7xl mx-auto flex items-center justify-center p-6 gap-8">
-        <div className="w-1/3 flex flex-col gap-4">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 lg:flex-row lg:items-center lg:justify-center lg:gap-8">
+        <div className="w-full lg:w-[360px] xl:w-[420px] flex flex-col gap-4">
           <div className="bg-white p-8 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100">
             <div className="flex items-center gap-4 mb-8">
               <div className="w-12 h-12 bg-violet-100 rounded-xl flex items-center justify-center relative">
@@ -334,8 +334,8 @@ export const LiveAttendance: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex-1 max-w-3xl">
-          <div className="relative w-full aspect-[4/3] bg-slate-200 rounded-[2rem] overflow-hidden shadow-2xl shadow-violet-900/10 border-8 border-white">
+        <div className="w-full lg:flex-1 lg:max-w-3xl">
+          <div className="relative w-full aspect-[4/3] min-h-[280px] bg-slate-200 rounded-[2rem] overflow-hidden shadow-2xl shadow-violet-900/10 border-8 border-white">
             <video
               ref={videoRef}
               autoPlay
@@ -376,7 +376,7 @@ export const LiveAttendance: React.FC = () => {
               </div>
             )}
 
-            <div className="absolute inset-0 pointer-events-none p-12">
+            <div className="absolute inset-0 pointer-events-none p-4 sm:p-8 lg:p-12">
               <div className="w-full h-full border-2 border-dashed border-white/50 rounded-3xl relative">
                 <div className="absolute top-0 left-0 w-12 h-12 border-t-4 border-l-4 border-violet-500 rounded-tl-3xl -ml-[2px] -mt-[2px]"></div>
                 <div className="absolute top-0 right-0 w-12 h-12 border-t-4 border-r-4 border-violet-500 rounded-tr-3xl -mr-[2px] -mt-[2px]"></div>

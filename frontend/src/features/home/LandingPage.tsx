@@ -6,7 +6,7 @@ export const LandingPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-violet-200 overflow-x-hidden">
       
-      <nav className="w-full absolute top-0 left-0 z-50 px-6 py-6 lg:px-12 flex justify-between items-center">
+      <nav className="w-full absolute top-0 left-0 z-50 px-4 py-4 sm:px-6 sm:py-6 lg:px-12 flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-violet-600 rounded-xl flex items-center justify-center shadow-lg shadow-violet-600/20">
             <ScanFace className="w-6 h-6 text-white" />
@@ -23,18 +23,18 @@ export const LandingPage: React.FC = () => {
         </div>
       </nav>
 
-      <main className="relative pt-32 pb-16 lg:pt-48 lg:pb-32 px-6 lg:px-12 max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-16">
+      <main className="relative pt-28 pb-16 sm:pt-32 lg:pt-48 lg:pb-32 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-10 sm:gap-16">
         
         <div className="absolute top-0 right-0 -translate-y-12 translate-x-1/3 w-[800px] h-[800px] bg-violet-400/10 blur-[120px] rounded-full pointer-events-none"></div>
         <div className="absolute bottom-0 left-0 translate-y-1/3 -translate-x-1/3 w-[600px] h-[600px] bg-blue-400/10 blur-[100px] rounded-full pointer-events-none"></div>
 
         <div className="flex-1 text-center lg:text-left relative z-10">
-          <h1 className="text-5xl lg:text-7xl font-extrabold text-slate-900 tracking-tight leading-[1.1] mb-8">
+          <h1 className="text-4xl sm:text-5xl lg:text-7xl font-extrabold text-slate-900 tracking-tight leading-[1.1] mb-6 sm:mb-8">
             Sistem Presensi <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-blue-600">Face Recognition</span>
           </h1>
           
-          <p className="text-lg text-slate-600 mb-10 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+          <p className="text-base sm:text-lg text-slate-600 mb-8 sm:mb-10 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
             Aplikasi absensi biometrik yang mengekstrak vektor wajah untuk validasi identitas. Memanfaatkan perhitungan Euclidean distance untuk mencocokkan matriks wajah secara real-time dan menyimpan log absensi langsung ke dalam database.
           </p>
 
@@ -78,8 +78,8 @@ export const LandingPage: React.FC = () => {
         </div>
       </main>
 
-      <section className="bg-white border-t border-slate-100 py-24 relative z-10">
-        <div className="max-w-7xl mx-auto px-6 lg:px-12">
+      <section className="bg-white border-t border-slate-100 py-16 sm:py-24 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">Spesifikasi Sistem</h2>
             <p className="text-slate-500">Arsitektur aplikasi yang dirancang khusus untuk efisiensi pemrosesan data biometrik.</p>
