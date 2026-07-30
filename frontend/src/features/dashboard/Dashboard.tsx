@@ -20,6 +20,8 @@ interface AttendanceLog {
   timestamp: string;
   type: 'IN' | 'OUT';
   status: string;
+  attendanceStatus?: 'ON_TIME' | 'LATE';
+  lateMinutes?: number;
   confidence: number;
   user: { employeeId: string; firstName: string; lastName: string; };
 }
@@ -442,12 +444,13 @@ export const Dashboard: React.FC = () => {
                       <th className="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">Waktu & Tanggal</th>
                       <th className="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">Karyawan</th>
                       <th className="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">Tipe</th>
+                      <th className="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">Keterlambatan</th>
                       <th className="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">Euclidean Distance</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {attendanceLogs.length === 0 ? (
-                      <tr><td colSpan={4} className="py-10 text-center text-slate-500">Belum ada riwayat absensi.</td></tr>
+                      <tr><td colSpan={5} className="py-10 text-center text-slate-500">Belum ada riwayat absensi.</td></tr>
                     ) : (
                       attendanceLogs.map((log) => (
                         <tr key={log.id} className="hover:bg-slate-50 transition-colors">
@@ -459,8 +462,13 @@ export const Dashboard: React.FC = () => {
                             {log.user?.firstName} {log.user?.lastName} <span className="text-slate-400">({log.user?.employeeId})</span>
                           </td>
                           <td className="py-4 px-6">
-                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${log.type === 'IN' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
+                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${log.type === 'IN' ? 'bg-violet-50 text-violet-700' : 'bg-amber-50 text-amber-600'}`}>
                               {log.type === 'IN' ? 'Masuk' : 'Pulang'}
+                            </span>
+                          </td>
+                          <td className="py-4 px-6">
+                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${log.attendanceStatus === 'LATE' ? 'bg-amber-100 text-amber-800' : 'bg-violet-50 text-violet-700'}`}>
+                              {log.attendanceStatus === 'LATE' ? `Terlambat ${log.lateMinutes ?? 0} menit` : 'Tepat Waktu'}
                             </span>
                           </td>
                           <td className="py-4 px-6 text-sm text-slate-500 font-mono">

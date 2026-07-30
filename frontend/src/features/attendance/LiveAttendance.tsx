@@ -153,10 +153,19 @@ export const LiveAttendance: React.FC = () => {
 
   const recordAttendance = async (userId: string, firstName: string, lastName: string) => {
     try {
-      await axios.post('https://faceattend-tjuy.vercel.app/api/v1/attendance', { userId, confidence: 0.1 });
+      const response = await axios.post('https://faceattend-tjuy.vercel.app/api/v1/attendance', { userId, confidence: 0.1 });
+      const log = response.data?.data;
+      const isLate = log?.attendanceStatus === 'LATE';
+      const lateMinutes = Number(log?.lateMinutes || 0);
 
       setIsScanComplete(true);
-      await speakText(`Absensi berhasil, selamat datang ${firstName} ${lastName}`);
+
+      if (isLate) {
+        await speakText(`Absensi berhasil, ${firstName} ${lastName}. Anda tercatat terlambat ${lateMinutes} menit, silakan jangan diulangi.`);
+      } else {
+        await speakText(`Absensi berhasil, selamat datang ${firstName} ${lastName}.`);
+      }
+
       cleanSwal.fire({
         icon: 'success',
         title: 'Absensi Berhasil',
