@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import prisma from '../config/prisma';
-import { AttendanceStatus } from '@prisma/client';
 
 export class AttendanceController {
   recordAttendance = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -24,7 +23,7 @@ export class AttendanceController {
       normalCheckIn.setHours(7, 0, 0, 0);
 
       const isLate = type === 'IN' && now > normalCheckIn;
-      const attendanceStatus = isLate ? AttendanceStatus.LATE : AttendanceStatus.ON_TIME;
+      const attendanceStatus = isLate ? 'LATE' : 'ON_TIME';
       const lateMinutes = isLate ? Math.max(0, Math.floor((now.getTime() - normalCheckIn.getTime()) / 60000)) : 0;
 
       const log = await prisma.attendanceLog.create({
