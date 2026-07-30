@@ -81,15 +81,17 @@ model FaceDescriptor {
 }
 
 model AttendanceLog {
-  id          String   @id @default(uuid()) @db.Uuid
-  userId      String   @map("user_id") @db.Uuid
-  type        LogType  
-  timestamp   DateTime @default(now())
-  status      Status   @default(SUCCESS)
-  confidence  Float?   
-  snapshotUrl String?  @map("snapshot_url")
+  id               String            @id @default(uuid()) @db.Uuid
+  userId           String            @map("user_id") @db.Uuid
+  type             LogType
+  timestamp        DateTime          @default(now())
+  status           Status            @default(SUCCESS)
+  attendanceStatus AttendanceStatus  @default(ON_TIME)
+  lateMinutes      Int?              @map("late_minutes")
+  confidence       Float?
+  snapshotUrl      String?           @map("snapshot_url")
   
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, timestamp])
   @@map("attendance_logs")
@@ -128,4 +130,9 @@ enum Status {
   SUCCESS
   FAILED
   SPOOF_DETECTED
+}
+
+enum AttendanceStatus {
+  ON_TIME
+  LATE
 }

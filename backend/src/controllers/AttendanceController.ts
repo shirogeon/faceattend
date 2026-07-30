@@ -1,12 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
 import prisma from '../config/prisma';
+import { AttendanceStatus } from '@prisma/client';
 
 export class AttendanceController {
   recordAttendance = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { userId, confidence } = req.body;
-      
-      const startOfDay = new Date();
+
+      const now = new Date();
+      const startOfDay = new Date(now);
       startOfDay.setHours(0, 0, 0, 0);
 
       const lastLog = await prisma.attendanceLog.findFirst({
@@ -18,12 +20,20 @@ export class AttendanceController {
       });
 
       const type = (!lastLog || lastLog.type === 'OUT') ? 'IN' : 'OUT';
-      
+      const normalCheckIn = new Date(now);
+      normalCheckIn.setHours(7, 0, 0, 0);
+
+      const isLate = type === 'IN' && now > normalCheckIn;
+      const attendanceStatus = isLate ? AttendanceStatus.LATE : AttendanceStatus.ON_TIME;
+      const lateMinutes = isLate ? Math.max(0, Math.floor((now.getTime() - normalCheckIn.getTime()) / 60000)) : 0;
+
       const log = await prisma.attendanceLog.create({
         data: {
           userId,
           type,
-          confidence: Number(confidence)
+          confidence: Number(confidence),
+          attendanceStatus,
+          lateMinutes: type === 'IN' ? lateMinutes : 0
         }
       });
 
